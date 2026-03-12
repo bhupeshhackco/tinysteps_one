@@ -39,20 +39,27 @@ class ParentHomeScreen extends StatelessWidget {
           children: [
             // Greeting
             Text('Hello, $name 👋', style: AppTextStyles.heading1),
-            const Text('Here are your children', style: AppTextStyles.bodyMuted),
+            const Text('Your children are doing great today!', style: AppTextStyles.bodyMuted),
             const SizedBox(height: AppSpacing.lg),
+
+            // Children List
+            Wrap(
+              spacing: AppSpacing.md,
+              runSpacing: AppSpacing.md,
+              children: [
+                _ChildAvatar(name: 'Leo', status: 'In Class', color: Colors.blue),
+                _ChildAvatar(name: 'Mia', status: 'Checked Out', color: Colors.orange),
+              ],
+            ),
+            
+            const SizedBox(height: AppSpacing.xl),
+            const Text('Quick Actions', style: AppTextStyles.heading2),
+            const SizedBox(height: AppSpacing.md),
 
             // Quick-action cards
             _QuickActionCard(
-              icon: Icons.child_care,
-              label: 'My Children',
-              color: AppColors.primary,
-              onTap: () {/* TODO: navigate to child list */},
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _QuickActionCard(
               icon: Icons.qr_code,
-              label: 'Show QR Code',
+              label: 'Show My QR Code',
               color: AppColors.secondary,
               onTap: () {/* TODO: navigate to QR screen */},
             ),
@@ -66,6 +73,30 @@ class ParentHomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ChildAvatar extends StatelessWidget {
+  final String name;
+  final String status;
+  final Color color;
+
+  const _ChildAvatar({required this.name, required this.status, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 30,
+          backgroundColor: color.withOpacity(0.2),
+          child: Text(name[0], style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 24)),
+        ),
+        const SizedBox(height: 8),
+        Text(name, style: AppTextStyles.labelBold),
+        Text(status, style: AppTextStyles.bodyMuted.copyWith(fontSize: 10, color: status == 'In Class' ? AppColors.success : AppColors.textMuted)),
+      ],
     );
   }
 }

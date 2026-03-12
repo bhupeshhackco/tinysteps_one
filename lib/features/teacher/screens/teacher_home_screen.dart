@@ -60,21 +60,63 @@ class TeacherHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            const Text("Today's Attendance", style: AppTextStyles.heading2),
+            const Text("Recent Scans", style: AppTextStyles.heading2),
             const SizedBox(height: AppSpacing.md),
 
-            // Placeholder — Squad C will replace with real list
-            Center(
-              child: Column(
-                children: [
-                  Icon(Icons.event_note, size: 64, color: AppColors.textMuted.withValues(alpha: 0.4)),
-                  const SizedBox(height: AppSpacing.sm),
-                  const Text('No scans yet today', style: AppTextStyles.bodyMuted),
-                ],
-              ),
-            ),
+            _AttendanceTile(name: 'Leo Smith', time: '08:15 AM', status: 'Checked In'),
+            const SizedBox(height: AppSpacing.sm),
+            _AttendanceTile(name: 'Mia Brown', time: '08:22 AM', status: 'Checked In'),
+            const SizedBox(height: AppSpacing.sm),
+            _AttendanceTile(name: 'Noah Wilson', time: '08:30 AM', status: 'Checked In'),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AttendanceTile extends StatelessWidget {
+  final String name;
+  final String time;
+  final String status;
+
+  const _AttendanceTile({required this.name, required this.time, required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: AppColors.primary.withOpacity(0.1),
+            child: const Icon(Icons.person, color: AppColors.primary),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name, style: AppTextStyles.labelBold),
+              Text(time, style: AppTextStyles.bodyMuted.copyWith(fontSize: 12)),
+            ],
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.success.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              status,
+              style: const TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }

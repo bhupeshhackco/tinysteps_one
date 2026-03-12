@@ -39,9 +39,9 @@ class AdminHomeScreen extends StatelessWidget {
             // Stat cards row
             Row(
               children: [
-                _StatCard(label: 'Total Users', value: '—', icon: Icons.people, color: AppColors.primary),
+                _StatCard(label: 'Total Users', value: '124', icon: Icons.people, color: AppColors.primary),
                 const SizedBox(width: AppSpacing.md),
-                _StatCard(label: 'Pending Approval', value: '—', icon: Icons.pending_actions, color: AppColors.warning),
+                _StatCard(label: 'Waitlist', value: '12', icon: Icons.pending_actions, color: AppColors.warning),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),

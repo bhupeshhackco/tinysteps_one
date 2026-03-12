@@ -17,10 +17,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passCtrl = TextEditingController();
   String _selectedRole = 'parent'; // default
   bool _loading = false;
+  bool _obscurePassword = true;
 
   final _roles = ['parent', 'teacher'];
 
   Future<void> _register() async {
+    if (_nameCtrl.text.isEmpty || _emailCtrl.text.isEmpty || _passCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields'), backgroundColor: AppColors.danger),
+      );
+      return;
+    }
+
     setState(() => _loading = true);
     try {
       await Supabase.instance.client.auth.signUp(
@@ -63,100 +71,205 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
-      appBar: AppBar(
-        title: const Text('Create Account'),
-        backgroundColor: AppColors.bgLight,
-        elevation: 0,
-      ),
-      body: SafeArea(
+      body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Join TinySteps', style: AppTextStyles.heading2),
-              const Text('Fill in your details below', style: AppTextStyles.bodyMuted),
-              const SizedBox(height: AppSpacing.xl),
-
-              // Full name
-              TextField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Full Name',
-                  prefixIcon: Icon(Icons.person_outline),
-                  border: OutlineInputBorder(),
-                ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xl),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              decoration: BoxDecoration(
+                color: AppColors.bgWhite,
+                borderRadius: BorderRadius.circular(AppRadius.lg + 8),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textDark.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.md),
-
-              // Email
-              TextField(
-                controller: _emailCtrl,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-
-              // Password
-              TextField(
-                controller: _passCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password (min 6 characters)',
-                  prefixIcon: Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-
-              // Role selector
-              const Text('I am a...', style: AppTextStyles.labelBold),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: _roles.map((role) {
-                  final selected = _selectedRole == role;
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ChoiceChip(
-                        label: Text(
-                          role[0].toUpperCase() + role.substring(1),
-                          style: TextStyle(
-                            color: selected ? AppColors.white : AppColors.textDark,
-                            fontWeight: FontWeight.w600,
-                          ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   // Logo row
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
                         ),
-                        selected: selected,
-                        selectedColor: AppColors.primary,
-                        onSelected: (_) => setState(() => _selectedRole = role),
+                        child: const Icon(Icons.child_care, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      const Flexible(
+                        child: Text(
+                          'TinySteps',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  
+                  const Text('Create Account', style: AppTextStyles.heading1),
+                  const Text('Join our community today', style: AppTextStyles.bodyMuted),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // Name Field
+                  Text('Full Name', style: AppTextStyles.labelBold),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _nameCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Jane Smith',
+                      prefixIcon: const Icon(Icons.person_outline, size: 20),
+                      filled: true,
+                      fillColor: AppColors.bgLight.withOpacity(0.5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: AppSpacing.lg),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
 
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _loading ? null : _register,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                  // Email Field
+                  Text('Email Address', style: AppTextStyles.labelBold),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      hintText: 'jane.smith@example.com',
+                      prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                      filled: true,
+                      fillColor: AppColors.bgLight.withOpacity(0.5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
-                  child: _loading
-                      ? const CircularProgressIndicator(color: AppColors.white)
-                      : const Text('Create Account', style: TextStyle(fontSize: 16, color: AppColors.white)),
-                ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Password Field
+                  Text('Password', style: AppTextStyles.labelBold),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _passCtrl,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      hintText: '••••••••',
+                      prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          size: 18,
+                        ),
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.bgLight.withOpacity(0.5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Role selector
+                  Text('I am a...', style: AppTextStyles.labelBold),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: _roles.map((role) {
+                      final selected = _selectedRole == role;
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: InkWell(
+                            onTap: () => setState(() => _selectedRole = role),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: selected ? AppColors.primary : AppColors.bgLight.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(AppRadius.md),
+                                border: Border.all(
+                                  color: selected ? AppColors.primary : Colors.transparent,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  role[0].toUpperCase() + role.substring(1),
+                                  style: TextStyle(
+                                    color: selected ? Colors.white : AppColors.textDark,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // Register Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _loading ? null : _register,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                        ),
+                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : const Text('Create Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Login link
+                  Center(
+                    child: TextButton(
+                      onPressed: () => context.go('/login'),
+                      child: RichText(
+                        text: const TextSpan(
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                          children: [
+                            TextSpan(text: 'Already have an account? '),
+                            TextSpan(
+                              text: 'Log In',
+                              style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

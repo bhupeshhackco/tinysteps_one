@@ -34,9 +34,8 @@ class TinyStepsApp extends ConsumerWidget {
       title: 'TinySteps',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF6C63FF),
+        colorSchemeSeed: const Color(0xFF00BFA5),
         useMaterial3: true,
-        fontFamily: 'Nunito',
       ),
       routerConfig: router,
     );
