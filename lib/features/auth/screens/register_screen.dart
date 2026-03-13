@@ -79,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               constraints: const BoxConstraints(maxWidth: 400),
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
-                color: AppColors.bgWhite,
+                color: AppColors.bgSurface,
                 borderRadius: BorderRadius.circular(AppRadius.lg + 8),
                 boxShadow: [
                   BoxShadow(
@@ -120,8 +120,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   
-                  const Text('Create Account', style: AppTextStyles.heading1),
-                  const Text('Join our community today', style: AppTextStyles.bodyMuted),
+                  Text('Create Account', style: AppTextStyles.heading1),
+                  Text('Join our community today', style: AppTextStyles.bodyMuted),
                   const SizedBox(height: AppSpacing.xl),
 
                   // Name Field

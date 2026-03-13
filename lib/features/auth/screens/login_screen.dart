@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
               constraints: const BoxConstraints(maxWidth: 400),
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
-                color: AppColors.bgWhite,
+                color: AppColors.bgSurface,
                 borderRadius: BorderRadius.circular(AppRadius.lg + 8),
                 boxShadow: [
                   BoxShadow(
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   
-                  const Text('TinySteps', style: AppTextStyles.heading1),
+                  Text('TinySteps', style: AppTextStyles.heading1),
                   const SizedBox(height: 4),
                   const Text('Safe. Caring. Connected.', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w500)),
                   const SizedBox(height: AppSpacing.xxl),

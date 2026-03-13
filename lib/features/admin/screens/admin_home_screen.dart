@@ -17,7 +17,7 @@ class AdminHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       appBar: AppBar(
-        title: const Text('Admin Panel', style: AppTextStyles.heading2),
+        title: Text('Admin Panel', style: AppTextStyles.heading2),
         backgroundColor: AppColors.bgLight,
         elevation: 0,
         actions: [
@@ -32,8 +32,8 @@ class AdminHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Admin Control Panel', style: AppTextStyles.heading1),
-            const Text('Manage staff, users, and classrooms', style: AppTextStyles.bodyMuted),
+            Text('Admin Control Panel', style: AppTextStyles.heading1),
+            Text('Manage staff, users, and classrooms', style: AppTextStyles.bodyMuted),
             const SizedBox(height: AppSpacing.xl),
 
             // Stat cards row
@@ -46,7 +46,7 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            const Text('Quick Actions', style: AppTextStyles.heading2),
+            Text('Quick Actions', style: AppTextStyles.heading2),
             const SizedBox(height: AppSpacing.md),
 
             ListTile(

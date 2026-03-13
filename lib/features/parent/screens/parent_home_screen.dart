@@ -21,7 +21,7 @@ class ParentHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       appBar: AppBar(
-        title: const Text('TinySteps', style: AppTextStyles.heading2),
+        title: Text('TinySteps', style: AppTextStyles.heading2),
         backgroundColor: AppColors.bgLight,
         elevation: 0,
         actions: [
@@ -39,7 +39,7 @@ class ParentHomeScreen extends StatelessWidget {
           children: [
             // Greeting
             Text('Hello, $name 👋', style: AppTextStyles.heading1),
-            const Text('Your children are doing great today!', style: AppTextStyles.bodyMuted),
+            Text('Your children are doing great today!', style: AppTextStyles.bodyMuted),
             const SizedBox(height: AppSpacing.lg),
 
             // Children List
@@ -53,7 +53,7 @@ class ParentHomeScreen extends StatelessWidget {
             ),
             
             const SizedBox(height: AppSpacing.xl),
-            const Text('Quick Actions', style: AppTextStyles.heading2),
+            Text('Quick Actions', style: AppTextStyles.heading2),
             const SizedBox(height: AppSpacing.md),
 
             // Quick-action cards

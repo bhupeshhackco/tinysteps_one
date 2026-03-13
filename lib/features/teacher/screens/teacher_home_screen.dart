@@ -20,7 +20,7 @@ class TeacherHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       appBar: AppBar(
-        title: const Text('Teacher Dashboard', style: AppTextStyles.heading2),
+        title: Text('Teacher Dashboard', style: AppTextStyles.heading2),
         backgroundColor: AppColors.bgLight,
         elevation: 0,
         actions: [
@@ -36,7 +36,7 @@ class TeacherHomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Good day, $name 📋', style: AppTextStyles.heading1),
-            const Text("Ready to take attendance?", style: AppTextStyles.bodyMuted),
+            Text("Ready to take attendance?", style: AppTextStyles.bodyMuted),
             const SizedBox(height: AppSpacing.xl),
 
             // Scan QR button – primary CTA
@@ -60,7 +60,7 @@ class TeacherHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            const Text("Recent Scans", style: AppTextStyles.heading2),
+            Text("Recent Scans", style: AppTextStyles.heading2),
             const SizedBox(height: AppSpacing.md),
 
             _AttendanceTile(name: 'Leo Smith', time: '08:15 AM', status: 'Checked In'),

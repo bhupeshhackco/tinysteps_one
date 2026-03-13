@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'core/constants/app_theme.dart';
 import 'core/router/app_router.dart';
 
 Future<void> main() async {
@@ -33,10 +34,9 @@ class TinyStepsApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'TinySteps',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF00BFA5),
-        useMaterial3: true,
-      ),
+      theme: sunriseLightTheme(),
+      darkTheme: sunriseDarkTheme(),
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }
