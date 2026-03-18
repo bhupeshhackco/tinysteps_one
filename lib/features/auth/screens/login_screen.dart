@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen>
   late final AnimationController _fadeCtrl;
   late final Animation<double> _fadeAnim;
   late final Animation<Offset> _slideAnim;
+  late final StreamSubscription<AuthState> _authSub;
 
   @override
   void initState() {
@@ -37,10 +40,34 @@ class _LoginScreenState extends State<LoginScreen>
         .animate(
             CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOutCubic));
     _fadeCtrl.forward();
+
+    // Listen for auth state changes so that when a user taps the
+    // verification email link (deep link → PKCE completes), we
+    // automatically navigate them to the correct dashboard.
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (!mounted) return;
+      final event = data.event;
+      final session = data.session;
+      if ((event == AuthChangeEvent.signedIn ||
+              event == AuthChangeEvent.tokenRefreshed) &&
+          session != null) {
+        // Clear any verify banner
+        setState(() => _showVerifyBanner = false);
+        final role =
+            session.user.userMetadata?['role'] as String? ?? 'parent';
+        final route = switch (role) {
+          'teacher' => '/teacher',
+          'admin'   => '/admin',
+          _         => '/parent',
+        };
+        context.go(route);
+      }
+    });
   }
 
   @override
   void dispose() {
+    _authSub.cancel();
     _fadeCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
@@ -56,11 +83,20 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     try {
-      await Supabase.instance.client.auth.signInWithPassword(
+      final response = await Supabase.instance.client.auth.signInWithPassword(
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text.trim(),
       );
-      // GoRouter redirect handles role-based navigation on success
+      // Explicit role-based navigation (GoRouter refreshListenable also handles this)
+      if (mounted) {
+        final role = response.user?.userMetadata?['role'] as String? ?? 'parent';
+        final route = switch (role) {
+          'teacher' => '/teacher',
+          'admin'   => '/admin',
+          _         => '/parent',
+        };
+        context.go(route);
+      }
     } on AuthException catch (e) {
       if (!mounted) return;
       final msg = e.message.toLowerCase();
