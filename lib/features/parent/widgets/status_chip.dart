@@ -24,8 +24,8 @@ class StatusChip extends StatelessWidget {
         bgColor = AppColors.dangerLight;
         break;
       case 'Checked Out':
-        color = AppColors.info;
-        bgColor = AppColors.infoLight;
+        color = AppColors.danger;
+        bgColor = AppColors.dangerLight;
         break;
       default:
         color = AppColors.textMuted;

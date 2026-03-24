@@ -3,8 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_theme.dart';
 import '../widgets/child_avatar.dart';
-import '../widgets/status_chip.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/qr_display_sheet.dart';
 
 /// Parent Home Screen — Squad B's home base
 /// TODO (Child Profiles Squad): Replace placeholder cards with child list
@@ -52,7 +52,8 @@ class ParentHomeScreen extends StatelessWidget {
               children: [
                 const ChildAvatar(name: 'Leo', status: 'In Class', color: Colors.blue, size: 60),
                 const ChildAvatar(name: 'Mia', status: 'Checked Out', color: Colors.orange, size: 60),
-                const ChildAvatar(name: 'S', status: 'Large Demo', color: Colors.purple, size: 80), // Larger variant
+                const ChildAvatar(name: 'Sam', status: 'In Class', color: Colors.green, size: 60),
+                const ChildAvatar(name: 'Riya', status: 'At Home', color: Colors.pink, size: 60),
               ],
             ),
             
@@ -65,37 +66,18 @@ class ParentHomeScreen extends StatelessWidget {
               icon: Icons.qr_code,
               label: 'Show My QR Code',
               color: AppColors.secondary,
-              onTap: () {/* TODO: navigate to QR screen */},
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _QuickActionCard(
-              icon: Icons.calendar_today,
-              label: 'Attendance History',
-              color: AppColors.success,
-              onTap: () {/* TODO: navigate to attendance screen */},
+              onTap: () => showQRDisplaySheet(
+                context,
+                childId: 'dummy-child-001',
+                childName: 'Leo Smith',
+              ),
             ),
 
             const SizedBox(height: AppSpacing.xl),
-            Text('Quick Examples (Squad B)', style: AppTextStyles.labelBold.copyWith(color: AppColors.textMuted)),
-            const SizedBox(height: AppSpacing.md),
-            
-            // Example 1: Status Badges for different scenarios
-            Text('Status Badges:', style: AppTextStyles.caption),
-            const SizedBox(height: AppSpacing.xs),
-            const Wrap(
-              spacing: AppSpacing.sm,
-              children: [
-                StatusChip(status: 'Checked In'),
-                StatusChip(status: 'At Home'),
-                StatusChip(status: 'Checked Out'),
-              ],
-            ),
-            
-            const SizedBox(height: AppSpacing.lg),
-            
-            // Example 2: Empty State for messages
-            Text('Empty Messages List:', style: AppTextStyles.caption),
-            const SizedBox(height: AppSpacing.xs),
+
+            // Messages Section
+            Text('Messages', style: AppTextStyles.heading2),
+            const SizedBox(height: AppSpacing.sm),
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -108,12 +90,12 @@ class ParentHomeScreen extends StatelessWidget {
                 icon: Icons.forum_outlined,
               ),
             ),
-            
-            const SizedBox(height: AppSpacing.md),
-            
-            // Example 3: Empty State for calendar/events
-            Text('Empty Calendar:', style: AppTextStyles.caption),
-            const SizedBox(height: AppSpacing.xs),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // Upcoming Events Section
+            Text('Upcoming Events', style: AppTextStyles.heading2),
+            const SizedBox(height: AppSpacing.sm),
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -126,6 +108,8 @@ class ParentHomeScreen extends StatelessWidget {
                 icon: Icons.event_busy_outlined,
               ),
             ),
+
+            const SizedBox(height: AppSpacing.xl),
           ],
         ),
       ),

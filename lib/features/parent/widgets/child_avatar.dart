@@ -41,7 +41,9 @@ class ChildAvatar extends StatelessWidget {
             fontSize: 10,
             color: (status == 'Checked In' || status == 'In Class')
                 ? AppColors.success
-                : AppColors.textMuted,
+                : status == 'Checked Out'
+                    ? AppColors.danger
+                    : AppColors.textMuted,
           ),
         ),
       ],
