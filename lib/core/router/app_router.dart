@@ -10,6 +10,7 @@ import '../../features/auth/screens/register_screen.dart';
 import '../../features/parent/screens/parent_home_screen.dart';
 import '../../features/parent/screens/parent_settings_screen.dart';
 import '../../features/teacher/screens/teacher_home_screen.dart';
+import '../../features/teacher/screens/attendance_screen.dart';
 import '../../features/admin/screens/admin_home_screen.dart';
 
 // ── Listens to Supabase auth state and notifies GoRouter to re-evaluate ──────
@@ -64,6 +65,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/register', builder: (c, s) => const RegisterScreen()),
       GoRoute(path: '/parent',  builder: (c, s) => const ParentShell()),
       GoRoute(path: '/teacher', builder: (c, s) => const TeacherHomeScreen()),
+      GoRoute(path: '/teacher/attendance', builder: (c, s) => const AttendanceScreen()),
       GoRoute(path: '/admin',   builder: (c, s) => const AdminHomeScreen()),
     ],
   );

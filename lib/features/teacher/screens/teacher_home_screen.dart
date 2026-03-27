@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_theme.dart';
 
@@ -43,7 +44,7 @@ class TeacherHomeScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () {/* TODO: push QR scanner screen */},
+                onPressed: () => context.go('/teacher/attendance'),
                 icon: const Icon(Icons.qr_code_scanner, color: AppColors.white),
                 label: const Text(
                   'Scan QR Code',
