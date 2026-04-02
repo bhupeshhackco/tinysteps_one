@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tinysteps/core/constants/app_theme.dart';
 
-class MyChildrenScreen extends StatelessWidget {
+class MyChildrenScreen extends StatefulWidget {
   const MyChildrenScreen({super.key});
 
-  // Placeholder children — intern will replace with Supabase data
-  static const _placeholderChildren = [
-    {'id': 'child-001', 'name': 'Leo Smith', 'dob': '12 Apr 2021', 'classroom': 'Sunshine Room'},
-    {'id': 'child-002', 'name': 'Mia Smith', 'dob': '03 Aug 2022', 'classroom': 'Rainbow Room'},
-  ];
+  @override
+  State<MyChildrenScreen> createState() => _MyChildrenScreenState();
+}
+
+class _MyChildrenScreenState extends State<MyChildrenScreen> {
+  final _supabase = Supabase.instance.client;
+  late Future<List<dynamic>> _childrenFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChildren();
+  }
+
+  void _loadChildren() {
+    final uid = _supabase.auth.currentUser?.id;
+    if (uid == null) {
+      _childrenFuture = Future.value([]);
+      return;
+    }
+    // Fetch children for current parent — same source as parent_home_screen
+    // Also join classrooms table to get classroom name
+    _childrenFuture = _supabase
+        .from('children')
+        .select('id, full_name, date_of_birth, status, classrooms(name)')
+        .eq('parent_id', uid)
+        .order('full_name');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,24 +44,83 @@ class MyChildrenScreen extends StatelessWidget {
         backgroundColor: AppColors.bgLight,
         elevation: 0,
       ),
-      body: _placeholderChildren.isEmpty
-          ? _buildEmptyState()
-          : ListView.separated(
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: () async => setState(() => _loadChildren()),
+        child: FutureBuilder<List<dynamic>>(
+          future: _childrenFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Text(
+                    'Failed to load children.\nPlease pull down to retry.',
+                    style: AppTextStyles.bodyMuted,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+
+            final children = snapshot.data ?? [];
+
+            if (children.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            return ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(AppSpacing.lg),
-              itemCount: _placeholderChildren.length,
-              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+              itemCount: children.length,
+              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) {
-                final child = _placeholderChildren[index];
+                final child = children[index] as Map<String, dynamic>;
+                final childId = child['id'] as String;
+                final name = child['full_name'] as String? ?? 'Child';
+                final dob = child['date_of_birth'] as String? ?? '';
+                final classroom = child['classrooms'] as Map<String, dynamic>?;
+                final classroomName = classroom?['name'] as String? ?? 'Unassigned';
+
+                // Format DOB from ISO (yyyy-MM-dd) to readable form
+                String formattedDob = dob;
+                if (dob.isNotEmpty) {
+                  try {
+                    final date = DateTime.parse(dob);
+                    formattedDob = '${date.day} ${_monthName(date.month)} ${date.year}';
+                  } catch (_) {
+                    // keep raw value
+                  }
+                }
+
                 return _ChildCard(
-                  childId: child['id']!,
-                  name: child['name']!,
-                  dob: child['dob']!,
-                  classroom: child['classroom']!,
+                  childId: childId,
+                  name: name,
+                  dob: formattedDob,
+                  classroom: classroomName,
                 );
               },
-            ),
+            );
+          },
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/parent/children/add'),
+        onPressed: () async {
+          final result = await context.push('/parent/children/add');
+          // Refresh list if a child was added
+          if (result == true && mounted) {
+            setState(() => _loadChildren());
+          }
+        },
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: AppColors.white),
       ),
@@ -58,6 +141,11 @@ class MyChildrenScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _monthName(int month) => const [
+        '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      ][month];
 }
 
 class _ChildCard extends StatelessWidget {
