@@ -29,7 +29,7 @@ class _UsersScreenState extends State<UsersScreen>
   void _refresh() {
     _teachersFuture = _supabase
         .from('teachers')
-        .select('id, full_name, email, staff_id, designation, is_approved, is_active')
+        .select('id, full_name, email, staff_id, designation, is_approved, is_active, classrooms!classrooms_teacher_id_fkey(id, name)')
         .order('full_name');
 
     // FIX: Use correct FK hint for the children → parents relationship
@@ -162,11 +162,15 @@ class _UsersScreenState extends State<UsersScreen>
                 ),
                 title: Text(t['full_name'] ?? 'Unknown', style: AppTextStyles.labelBold),
                 subtitle: Builder(builder: (_) {
+                  final classroomsData = t['classrooms'] as List<dynamic>? ?? [];
+                  final classroomName = classroomsData.isNotEmpty 
+                      ? classroomsData.first['name'] as String 
+                      : 'No Classroom';
+
                   final parts = <String>[
                     if (t['designation'] != null && (t['designation'] as String).isNotEmpty)
                       t['designation'] as String,
-                    if (t['staff_id'] != null && (t['staff_id'] as String).isNotEmpty)
-                      'ID: ${t['staff_id']}',
+                    classroomName,
                   ];
                   return Text(
                     parts.isEmpty ? 'No details provided' : parts.join('  ·  '),
@@ -200,6 +204,10 @@ class _UsersScreenState extends State<UsersScreen>
     final designation = teacher['designation'] as String?;
     final isApproved = teacher['is_approved'] == true;
     final isActive = teacher['is_active'] == true;
+    
+    final classroomsData = teacher['classrooms'] as List<dynamic>? ?? [];
+    final currentClassroomName = classroomsData.isNotEmpty ? classroomsData.first['name'] as String : 'Not Assigned';
+    selectedClassroomId = classroomsData.isNotEmpty ? classroomsData.first['id'] as String : null;
 
     showDialog(
       context: context,
@@ -269,6 +277,12 @@ class _UsersScreenState extends State<UsersScreen>
                         const Divider(height: AppSpacing.lg, color: AppColors.border),
                       ],
                       _DetailRow(
+                        icon: Icons.meeting_room_outlined,
+                        label: 'Classroom',
+                        value: currentClassroomName,
+                      ),
+                      const Divider(height: AppSpacing.lg, color: AppColors.border),
+                      _DetailRow(
                         icon: Icons.email_outlined,
                         label: 'Email',
                         value: teacher['email'] as String? ?? '—',
@@ -328,35 +342,36 @@ class _UsersScreenState extends State<UsersScreen>
                 const SizedBox(height: AppSpacing.sm),
 
                 // ── Activate / Deactivate ──────────────────────────────
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: Icon(
-                      isActive ? Icons.person_off_outlined : Icons.person_add_alt_1,
-                      size: 18,
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: isActive ? AppColors.danger : AppColors.success,
-                      side: BorderSide(color: isActive ? AppColors.danger : AppColors.success),
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.buttonRadius),
-                    ),
-                    onPressed: () async {
-                      await _supabase
-                          .from('teachers')
-                          .update({'is_active': !isActive})
-                          .eq('id', teacher['id']);
-                      if (ctx.mounted) Navigator.pop(ctx);
-                      setState(() => _refresh());
-                    },
-                    label: Text(
-                      isActive ? 'Deactivate' : 'Activate',
-                      style: AppTextStyles.labelBold.copyWith(
-                        color: isActive ? AppColors.danger : AppColors.success,
+                if (isApproved)
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: Icon(
+                        isActive ? Icons.person_off_outlined : Icons.person_add_alt_1,
+                        size: 18,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: isActive ? AppColors.danger : AppColors.success,
+                        side: BorderSide(color: isActive ? AppColors.danger : AppColors.success),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        shape: RoundedRectangleBorder(borderRadius: AppRadius.buttonRadius),
+                      ),
+                      onPressed: () async {
+                        await _supabase
+                            .from('teachers')
+                            .update({'is_active': !isActive})
+                            .eq('id', teacher['id']);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        setState(() => _refresh());
+                      },
+                      label: Text(
+                        isActive ? 'Deactivate' : 'Activate',
+                        style: AppTextStyles.labelBold.copyWith(
+                          color: isActive ? AppColors.danger : AppColors.success,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(height: AppSpacing.lg),
 
                 // ── Assign Classroom ───────────────────────────────────
