@@ -18,6 +18,8 @@ import 'package:tinysteps/core/screens/about_app_screen.dart';
 import 'package:tinysteps/features/parent/screens/attendance_history_screen.dart';
 import 'package:tinysteps/features/teacher/screens/teacher_home_screen.dart';
 import 'package:tinysteps/features/teacher/screens/attendance_screen.dart';
+import 'package:tinysteps/features/teacher/screens/child_detail_screen.dart';
+import 'package:tinysteps/features/teacher/screens/my_classroom_screen.dart';
 import 'package:tinysteps/features/admin/screens/admin_home_screen.dart';
 
 // ── Listens to Supabase auth state and notifies GoRouter to re-evaluate ──────
@@ -90,6 +92,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ── Teacher ─────────────────────────────────────────────────────────────
       GoRoute(path: '/teacher',            builder: (c, s) => const TeacherHomeScreen()),
       GoRoute(path: '/teacher/attendance', builder: (c, s) => const AttendanceScreen()),
+      GoRoute(path: '/teacher/classroom', builder: (c, s) => const MyClassroomScreen()),
+      GoRoute(
+        path: '/teacher/child/:childId',
+        builder: (c, s) => ChildDetailScreen(
+          childId: s.pathParameters['childId']!,
+          childName: s.uri.queryParameters['name'] ?? 'Child',
+        ),
+      ),
 
       // ── Admin ────────────────────────────────────────────────────────────────
       GoRoute(path: '/admin', builder: (c, s) => const AdminHomeScreen()),

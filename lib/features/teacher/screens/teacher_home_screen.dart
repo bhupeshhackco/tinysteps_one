@@ -287,7 +287,7 @@ class _TodayAttendanceSummaryState extends State<_TodayAttendanceSummary> {
     // Fetch today's attendance for children assigned to this teacher
     _future = _supabase
         .from('attendance')
-        .select('checked_in_at, checked_out_at, children!inner(full_name, teacher_id)')
+        .select('child_id, checked_in_at, checked_out_at, children!inner(full_name, teacher_id)')
         .eq('date', today)
         .eq('children.teacher_id', uid ?? '');
   }
@@ -345,10 +345,18 @@ class _TodayAttendanceSummaryState extends State<_TodayAttendanceSummary> {
 
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-              child: _AttendanceTile(
-                name: name,
-                checkIn: checkIn,
-                checkOut: checkOut,
+              child: GestureDetector(
+                onTap: () {
+                  final id = row['child_id']?.toString() ?? '';
+                  if (id.isNotEmpty) {
+                    context.push('/teacher/child/$id?name=${Uri.encodeComponent(name)}');
+                  }
+                },
+                child: _AttendanceTile(
+                  name: name,
+                  checkIn: checkIn,
+                  checkOut: checkOut,
+                ),
               ),
             );
           }).toList(),
@@ -470,6 +478,14 @@ class _TeacherChildrenTabState extends State<_TeacherChildrenTab> {
         backgroundColor: AppColors.bgLight,
         elevation: 0,
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Classroom Settings',
+            onPressed: () => context.push('/teacher/classroom'),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+        ],
       ),
       body: RefreshIndicator(
         color: AppColors.primary,
@@ -518,56 +534,65 @@ class _TeacherChildrenTabState extends State<_TeacherChildrenTab> {
                 final status = c['status'] as String? ?? 'active';
                 final dob = c['date_of_birth'] as String?;
                 final age = dob != null ? _calcAge(dob) : null;
+                final nameStr = c['full_name'] as String? ?? 'Child';
 
-                return Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    border: Border.all(color: AppColors.border),
-                    boxShadow: AppShadows.card,
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: AppColors.primaryLight,
-                        child: Text(
-                          (c['full_name'] as String? ?? 'C')[0].toUpperCase(),
-                          style: AppTextStyles.heading3.copyWith(color: AppColors.primary),
+                return GestureDetector(
+                  onTap: () {
+                    final id = c['id']?.toString() ?? '';
+                    if (id.isNotEmpty) {
+                      context.push('/teacher/child/$id?name=${Uri.encodeComponent(nameStr)}');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: AppShadows.card,
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundColor: AppColors.primaryLight,
+                          child: Text(
+                            nameStr.isNotEmpty ? nameStr[0].toUpperCase() : 'C',
+                            style: AppTextStyles.heading3.copyWith(color: AppColors.primary),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(c['full_name'] ?? '—', style: AppTextStyles.labelBold),
-                            if (age != null)
-                              Text(age, style: AppTextStyles.bodySmall),
-                            if (c['allergies'] != null &&
-                                (c['allergies'] as String).isNotEmpty)
-                              Row(
-                                children: [
-                                  const Icon(Icons.warning_amber,
-                                      size: 12, color: AppColors.warning),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      c['allergies'] as String,
-                                      style: AppTextStyles.caption.copyWith(
-                                        color: AppColors.warning,
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(nameStr, style: AppTextStyles.labelBold),
+                              if (age != null)
+                                Text(age, style: AppTextStyles.bodySmall),
+                              if (c['allergies'] != null &&
+                                  (c['allergies'] as String).isNotEmpty)
+                                Row(
+                                  children: [
+                                    const Icon(Icons.warning_amber,
+                                        size: 12, color: AppColors.warning),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        c['allergies'] as String,
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: AppColors.warning,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                ],
-                              ),
-                          ],
+                                  ],
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                      _statusBadge(status),
-                    ],
+                        _statusBadge(status),
+                      ],
+                    ),
                   ),
                 );
               },
