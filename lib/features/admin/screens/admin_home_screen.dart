@@ -19,12 +19,16 @@ class AdminHomeScreen extends StatefulWidget {
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _tabs = const [
-    _AdminDashboardContent(),
-    UsersScreen(),
-    ClassroomsScreen(),
-    ChildrenOverviewScreen(),
-    AdminSettingsScreen(),
+  late final List<Widget> _tabs = [
+    _AdminDashboardContent(
+      onNavigate: (index) {
+        setState(() => _currentIndex = index);
+      },
+    ),
+    const UsersScreen(),
+    const ClassroomsScreen(),
+    const ChildrenOverviewScreen(),
+    const AdminSettingsScreen(),
   ];
 
   @override
@@ -57,7 +61,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 // Dashboard tab — live stats from DB
 // ─────────────────────────────────────────────────────────────────────────────
 class _AdminDashboardContent extends StatefulWidget {
-  const _AdminDashboardContent();
+  const _AdminDashboardContent({
+    required this.onNavigate,
+  });
+
+  final Function(int index) onNavigate;
 
   @override
   State<_AdminDashboardContent> createState() => _AdminDashboardContentState();
@@ -183,6 +191,7 @@ class _AdminDashboardContentState extends State<_AdminDashboardContent> {
                             value: '${stats['teachers']}',
                             icon: Icons.school,
                             color: AppColors.primary,
+                            onTap: () => widget.onNavigate(1),
                           ),
                           const SizedBox(width: AppSpacing.md),
                           _StatCard(
@@ -190,6 +199,7 @@ class _AdminDashboardContentState extends State<_AdminDashboardContent> {
                             value: '${stats['pendingTeachers']}',
                             icon: Icons.pending_actions,
                             color: AppColors.warning,
+                            onTap: () => widget.onNavigate(1),
                           ),
                         ],
                       ),
@@ -201,6 +211,7 @@ class _AdminDashboardContentState extends State<_AdminDashboardContent> {
                             value: '${stats['parents']}',
                             icon: Icons.family_restroom,
                             color: AppColors.secondary,
+                            onTap: () => widget.onNavigate(1),
                           ),
                           const SizedBox(width: AppSpacing.md),
                           _StatCard(
@@ -208,6 +219,7 @@ class _AdminDashboardContentState extends State<_AdminDashboardContent> {
                             value: '${stats['children']}',
                             icon: Icons.child_care,
                             color: AppColors.accent,
+                            onTap: () => widget.onNavigate(3),
                           ),
                         ],
                       ),
@@ -219,6 +231,7 @@ class _AdminDashboardContentState extends State<_AdminDashboardContent> {
                             value: '${stats['classrooms']}',
                             icon: Icons.class_,
                             color: AppColors.success,
+                            onTap: () => widget.onNavigate(2),
                           ),
                           const SizedBox(width: AppSpacing.md),
                           _StatCard(
@@ -226,6 +239,7 @@ class _AdminDashboardContentState extends State<_AdminDashboardContent> {
                             value: '${stats['unassigned']}',
                             icon: Icons.warning_amber,
                             color: AppColors.danger,
+                            onTap: () => widget.onNavigate(1),
                           ),
                         ],
                       ),
@@ -247,7 +261,10 @@ class _StatCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.color,
+    this.onTap,
   });
+
+  final VoidCallback? onTap;
 
   final String label;
   final String value;
@@ -257,7 +274,10 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -280,6 +300,6 @@ class _StatCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
